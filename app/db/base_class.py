@@ -1,12 +1,7 @@
 from datetime import datetime
 
-from app.core.config import settings
-from sqlalchemy import create_engine, Column, Integer, DateTime
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, DateTime
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
-
-engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 @as_declarative()
@@ -18,6 +13,8 @@ class Base:
     @declared_attr
     def __tablename__(cls) -> str:
         return cls.__name__.lower()
+
+
 
 
 class BareBaseModel(Base):
