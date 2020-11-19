@@ -16,7 +16,7 @@ class WalletSchemaCreate(WalletSchemaBase):
 
 
 class WalletSchemaUpdate(WalletSchemaBase):
-    name: str
+    pass
 
 
 class WalletSchema(WalletSchemaBase):

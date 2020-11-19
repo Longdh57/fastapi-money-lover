@@ -22,7 +22,14 @@ async def create(*, db: Session = Depends(deps.get_db), category: CategorySchema
     db_category = Category(
         name=category.name,
         description=category.description,
-        quota=category.quota
+        quota=category.quota,
+        type=category.type
     )
     db_category = crud.category.create(db=db, obj_in=db_category)
     return db_category
+
+
+@router.get("/{category_id}", response_model=CategorySchema)
+async def get(category_id: int, db: Session = Depends(deps.get_db)):
+    category = crud.category.get(db=db, id=category_id, error_out=True)
+    return category

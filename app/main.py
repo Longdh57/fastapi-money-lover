@@ -4,7 +4,8 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.api import router
 from app.core.config import settings
-from app.db.base_class import Base, SessionLocal, engine
+from app.db.base_class import Base
+from app.api.deps import engine
 
 Base.metadata.create_all(bind=engine)
 
@@ -17,16 +18,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# Dependency
-def get_db():
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()
-
 
 app.include_router(router, prefix=settings.API_PREFIX)
 
