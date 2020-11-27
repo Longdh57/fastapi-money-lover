@@ -6,27 +6,27 @@ from fastapi import APIRouter, Depends
 from app.api import deps
 from app import crud
 from app.models.category import Category
-from app.schema.category import CategorySchemaCreate, CategorySchema
+from app.schema.category import CategorySchema
 
 router = APIRouter()
 
 
-@router.get("", response_model=List[CategorySchema])
+@router.get("", response_model=CategorySchema)
 async def get(db: Session = Depends(deps.get_db), skip: int = 0, limit: int = 100):
     categories = crud.category.get_multi(db=db, skip=skip, limit=limit)
-    return categories
+    return {"data": categories}
 
 
-@router.post("", response_model=CategorySchemaCreate)
-async def create(*, db: Session = Depends(deps.get_db), category: CategorySchemaCreate):
-    db_category = Category(
-        name=category.name,
-        description=category.description,
-        quota=category.quota,
-        type=category.type
-    )
-    db_category = crud.category.create(db=db, obj_in=db_category)
-    return db_category
+# @router.post("", response_model=CategorySchemaCreate)
+# async def create(*, db: Session = Depends(deps.get_db), category: CategorySchemaCreate):
+#     db_category = Category(
+#         name=category.name,
+#         description=category.description,
+#         quota=category.quota,
+#         type=category.type
+#     )
+#     db_category = crud.category.create(db=db, obj_in=db_category)
+#     return db_category
 
 
 @router.get("/{category_id}", response_model=CategorySchema)
