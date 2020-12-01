@@ -1,10 +1,12 @@
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Generic, Type, TypeVar, Union, Optional
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app.api import deps
+from app.api.deps import SessionLocal
 from app.db.base_class import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
@@ -13,7 +15,7 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    def __init__(self, model: Type[ModelType], database: Session):
+    def __init__(self, model: Type[ModelType]):
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD).
 
@@ -23,22 +25,19 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         * `schema`: A Pydantic model (schema) class
         """
         self.model = model
-        self.database: Session = database
 
-    def get(self, db: Session, id: Any, error_out: bool = False) -> Optional[ModelType]:
-        print(f'self DB: {self.database}')
-        print(f'DB: {db}')
+    def get(self, id: Any, db: Session = SessionLocal(), error_out: bool = False):
         obj = db.query(self.model).filter(self.model.id == id).first()
         if not obj and error_out:
             raise HTTPException(status_code=404, detail="Item not found")
         return obj
 
     def get_multi(
-            self, db: Session, *, skip: int = 0, limit: int = 100
-    ) -> List[ModelType]:
+            self, db: Session = SessionLocal(), *, skip: int = 0, limit: int = 100
+    ):
         return db.query(self.model).offset(skip).limit(limit).all()
 
-    def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
+    def create(self, db: Session = SessionLocal(), *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data)  # type: ignore
         db.add(db_obj)
@@ -48,7 +47,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def update(
             self,
-            db: Session,
+            db: Session = SessionLocal(),
             *,
             db_obj: ModelType,
             obj_in: Union[UpdateSchemaType, Dict[str, Any]]
