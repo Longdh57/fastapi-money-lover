@@ -15,8 +15,6 @@ class Base:
         return cls.__name__.lower()
 
 
-
-
 class BareBaseModel(Base):
     __abstract__ = True
 

@@ -3,17 +3,32 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from app.helpers.enums import CategoryType
-from app.schema.base import SchemaBase
+from app.schema.base import SchemaBase, MetadataSchema
 
 
 class CategorySchemaBase(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    quota: Optional[int] = None
+    quota: Optional[int] = 0
     type: Optional[str] = None
 
     class Config:
         orm_mode = True
+
+
+class CategoryListSchema(SchemaBase):
+    class CategoryList(CategorySchemaBase):
+        id: int
+
+    data: Optional[List[CategoryList]]
+    metadata: Optional[MetadataSchema]
+
+
+class CategoryDetailSchema(SchemaBase):
+    class CategoryDetail(CategorySchemaBase):
+        id: int
+
+    data: Optional[CategoryDetail]
 
 
 class CategorySchemaCreate(CategorySchemaBase):
@@ -23,13 +38,3 @@ class CategorySchemaCreate(CategorySchemaBase):
 
 class CategorySchemaUpdate(CategorySchemaBase):
     name: str
-
-
-class CategorySchema(SchemaBase):
-    class CategoryListSchema(CategorySchemaBase):
-        id: int
-
-    code: int = 200
-    success: bool = True
-    message: str = ""
-    data: Optional[List[CategoryListSchema]]
