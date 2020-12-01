@@ -20,6 +20,8 @@ class TransactionSchemaBase(BaseModel):
 class TransactionListSchema(SchemaBase):
     class TransactionSchema(TransactionSchemaBase):
         id: int
+        category_name: str
+        category_type: str
 
     data: Optional[List[TransactionSchema]]
     metadata: Optional[MetadataSchema]
