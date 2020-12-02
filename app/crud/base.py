@@ -1,11 +1,10 @@
 from typing import Any, Dict, Generic, Type, TypeVar, Union, Optional
 
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.api import deps
 from app.api.deps import SessionLocal
 from app.db.base_class import Base
 
@@ -32,10 +31,44 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             raise HTTPException(status_code=404, detail="Item not found")
         return obj
 
-    def get_multi(
-            self, db: Session = SessionLocal(), *, skip: int = 0, limit: int = 100
-    ):
+    def get_multi(self, db: Session = SessionLocal(), *, skip: int = 0, limit: int = 100):
         return db.query(self.model).offset(skip).limit(limit).all()
+
+    def q(self, *criterion, db: Session = SessionLocal()):
+        """
+        Filter by criterion, ex: User.q(User.name=='Thuc', User.status==1)
+        :param criterion:
+        :return:
+        """
+        if criterion:
+            return db.query(self.model).filter(*criterion)
+        return db.query(self.model)
+
+    def q_by(self, db: Session = SessionLocal(), **kwargs):
+        """
+        Filter by named params, ex: User.q(name='Thuc', status=1)
+        :param kwargs:
+        :return:
+        """
+        return db.query(self.model).filter_by(**kwargs)
+
+    def first(self, *criterion):
+        """
+        Get first by list of criterion, ex: user1 = User.first(User.name=='Thuc1')
+        :param criterion:
+        :return:
+        """
+        res = self.q(*criterion).first()
+        return res
+
+    def first_or_error(self, *criterion):
+        res = self.first(*criterion)
+        if not res:
+            raise HTTPException(status_code=404, detail="Item not found")
+        return res
+
+    def all(self, *criterion):
+        return self.q(*criterion).all()
 
     def create(self, db: Session = SessionLocal(), *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
