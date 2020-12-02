@@ -6,11 +6,10 @@ from fastapi import APIRouter, Depends
 from app import crud
 from app.api import deps
 from app.helpers.response_helper import ResponseHelper
-from app.models import Wallet
 from app.models.category import Category
 from app.models.transaction import Transaction
-from app.schema.transaction import TransactionSchemaCreate, TransactionSchemaUpdate, \
-    TransactionListSchema, TransactionDetailSchema
+from app.schema.transaction import TransactionSchemaCreate, TransactionSchemaUpdate, TransactionListSchema, \
+    TransactionDetailSchema
 
 router = APIRouter()
 
@@ -28,7 +27,6 @@ async def get(db: Session = Depends(deps.get_db), *, wallet_id: int, page: int =
         Transaction.date_tran < to_date,
         Transaction.wallet_id == wallet_id
     ).order_by(Transaction.date_tran.desc()).all()
-    print(f'[x] query: {query}')
     transactions = []
     for item in query:
         transactions.append({

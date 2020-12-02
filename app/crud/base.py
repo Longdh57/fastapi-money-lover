@@ -1,11 +1,10 @@
 from typing import Any, Dict, Generic, Type, TypeVar, Union, Optional
 
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.api import deps
 from app.api.deps import SessionLocal
 from app.db.base_class import Base
 
