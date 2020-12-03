@@ -1,10 +1,9 @@
-from typing import List
-
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 
 from app import crud
 from app.api import deps
+from app.helpers.enums import CategoryType
 from app.models import Category
 from app.schema.category import CategoryListSchema, CategoryDetailSchema, CategorySchemaCreate
 from app.helpers.response_helper import ResponseHelper
@@ -13,10 +12,10 @@ router = APIRouter()
 
 
 @router.get("", response_model=CategoryListSchema)
-async def get(db: Session = Depends(deps.get_db), page: int = 0, pageSize: int = 10):
+async def get(page: int = 0, pageSize: int = 100, type: str = CategoryType.KHOAN_CHI.value):
     page = page
     page_size = pageSize
-    categories = crud.category.get_multi(db=db, skip=page, limit=pageSize)
+    categories = crud.category.q(Category.type == type).order_by(Category.name.asc()).all()
     total_items = 10
     return {
         "data": categories,
