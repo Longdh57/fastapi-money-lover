@@ -26,7 +26,7 @@ async def get(db: Session = Depends(deps.get_db), *, wallet_id: int, page: int =
         Transaction.date_tran >= from_date,
         Transaction.date_tran < to_date,
         Transaction.wallet_id == wallet_id
-    ).order_by(Transaction.date_tran.desc()).all()
+    ).order_by(Transaction.date_tran.desc(), Transaction.id.desc()).all()
     transactions = []
     for item in query:
         transactions.append({
