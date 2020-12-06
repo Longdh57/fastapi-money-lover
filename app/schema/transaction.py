@@ -4,6 +4,8 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from app.schema.base import SchemaBase, MetadataSchema
+from app.schema.category import CategorySchemaBase
+from app.schema.wallet import WalletSchemaBase
 
 
 class TransactionSchemaBase(BaseModel):
@@ -30,6 +32,8 @@ class TransactionListSchema(SchemaBase):
 class TransactionDetailSchema(SchemaBase):
     class TransactionDetail(TransactionSchemaBase):
         id: int
+        category: Optional[CategorySchemaBase]
+        wallet: Optional[WalletSchemaBase]
 
     data: Optional[TransactionDetail]
 
@@ -42,4 +46,4 @@ class TransactionSchemaCreate(TransactionSchemaBase):
 
 
 class TransactionSchemaUpdate(TransactionSchemaBase):
-    pass
+    date_tran: Optional[str]

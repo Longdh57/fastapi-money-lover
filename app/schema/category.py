@@ -7,6 +7,7 @@ from app.schema.base import SchemaBase, MetadataSchema
 
 
 class CategorySchemaBase(BaseModel):
+    id: Optional[int] = None
     name: Optional[str] = None
     description: Optional[str] = None
     quota: Optional[int] = 0

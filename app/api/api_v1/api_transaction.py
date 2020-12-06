@@ -49,6 +49,11 @@ async def get(db: Session = Depends(deps.get_db), *, wallet_id: int, page: int =
 @router.get("/{transaction_id}", response_model=TransactionDetailSchema)
 async def get(transaction_id: int):
     transaction = crud.transaction.get(id=transaction_id, error_out=True)
+    category = crud.category.get(id=transaction.category_id, error_out=True)
+    wallet = crud.wallet.get(id=transaction.wallet_id, error_out=True)
+    transaction = transaction.__dict__
+    transaction['category'] = category
+    transaction['wallet'] = wallet
     return {"data": transaction}
 
 
