@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     SECRET_KEY = os.getenv('SECRET_KEY', '')
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = get_list(os.getenv('FONTEND_URL'))
     DATABASE_URL = os.getenv('SQL_DATABASE_URL', '')
+    MINIO_URL = os.getenv('MINIO_URL', '')
+    MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', '')
+    MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', '')
 
 
 settings = Settings()

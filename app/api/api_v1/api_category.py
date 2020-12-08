@@ -7,6 +7,7 @@ from app.helpers.enums import CategoryType
 from app.models import Category
 from app.schema.category import CategoryListSchema, CategoryDetailSchema, CategorySchemaCreate
 from app.helpers.response_helper import ResponseHelper
+from app.services.minio_srv import *
 
 router = APIRouter()
 
@@ -33,6 +34,15 @@ async def create(*, db: Session = Depends(deps.get_db), category: CategorySchema
     )
     category = crud.category.create(db=db, obj_in=db_category)
     return {"data": category}
+
+
+@router.get("/minio")
+def get():
+    minio_get_object_url(
+        'longtest',
+        'test_file3'
+    )
+    return None
 
 
 @router.get("/{category_id}", response_model=CategoryDetailSchema)
