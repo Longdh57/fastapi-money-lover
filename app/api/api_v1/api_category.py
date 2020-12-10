@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 
@@ -12,10 +14,13 @@ router = APIRouter()
 
 
 @router.get("", response_model=CategoryListSchema)
-async def get(page: int = 0, pageSize: int = 100, type: str = CategoryType.KHOAN_CHI.value):
+async def get(type: Optional[CategoryType] = None, page: int = 0, pageSize: int = 100):
     page = page
     page_size = pageSize
-    categories = crud.category.q(Category.type == type).order_by(Category.name.asc()).all()
+    _query = crud.category.q()
+    if type is not None:
+        _query = _query.filter(Category.type == type)
+    categories = _query.order_by(Category.name.asc()).all()
     total_items = 10
     return {
         "data": categories,
