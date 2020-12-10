@@ -4,8 +4,8 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.api import router
 from app.core.config import settings
-from app.db.base_class import Base
-from app.api.deps import engine
+from app.models.base_model import Base
+from app.db.base_class import engine
 
 Base.metadata.create_all(bind=engine)
 

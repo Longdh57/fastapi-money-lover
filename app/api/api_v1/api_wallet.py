@@ -1,11 +1,8 @@
-from typing import List
-
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 
 from app import crud
-from app.api import deps
+from app.db.base_class import get_db
 from app.helpers.response_helper import ResponseHelper
 from app.models.wallet import Wallet
 from app.schema.wallet import WalletSchemaCreate, WalletListSchema, WalletSchemaUpdate, WalletDetailSchema
@@ -42,7 +39,7 @@ async def create(*, wallet: WalletSchemaCreate):
 
 
 @router.put("/{wallet_id}", response_model=WalletDetailSchema)
-async def update(*, wallet_id: int, db: Session = Depends(deps.get_db), wallet_data: WalletSchemaUpdate):
+async def update(*, wallet_id: int, db: Session = Depends(get_db), wallet_data: WalletSchemaUpdate):
     wallet = crud.wallet.get(db=db, id=wallet_id, error_out=True)
     wallet = crud.wallet.update(db=db, db_obj=wallet, obj_in=wallet_data)
     return {"data": wallet}

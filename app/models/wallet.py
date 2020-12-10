@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Text
-from app.db.base_class import BareBaseModel
+from app.models.base_model import BareBaseModel
 
 
 class Wallet(BareBaseModel):
