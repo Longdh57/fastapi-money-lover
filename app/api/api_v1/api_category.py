@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 
 from app import crud
-from app.api import deps
+from app.db.base_class import get_db
 from app.helpers.enums import CategoryType
 from app.models import Category
 from app.schema.category import CategoryListSchema, CategoryDetailSchema, CategorySchemaCreate
@@ -24,7 +24,7 @@ async def get(page: int = 0, pageSize: int = 100, type: str = CategoryType.KHOAN
 
 
 @router.post("", response_model=CategoryDetailSchema)
-async def create(*, db: Session = Depends(deps.get_db), category: CategorySchemaCreate):
+async def create(*, db: Session = Depends(get_db), category: CategorySchemaCreate):
     db_category = Category(
         name=category.name,
         description=category.description,
@@ -36,6 +36,6 @@ async def create(*, db: Session = Depends(deps.get_db), category: CategorySchema
 
 
 @router.get("/{category_id}", response_model=CategoryDetailSchema)
-async def get(category_id: int, db: Session = Depends(deps.get_db)):
+async def get(category_id: int, db: Session = Depends(get_db)):
     category = crud.category.get(db=db, id=category_id, error_out=True)
     return {"data": category}

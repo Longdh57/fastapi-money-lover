@@ -4,10 +4,10 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 
 from app import crud
-from app.api import deps
-from app.helpers.response_helper import ResponseHelper
+from app.db.base_class import get_db
 from app.models.category import Category
 from app.models.transaction import Transaction
+from app.helpers.response_helper import ResponseHelper
 from app.schema.transaction import TransactionSchemaCreate, TransactionSchemaUpdate, TransactionListSchema, \
     TransactionDetailSchema
 
@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get("", response_model=TransactionListSchema)
-async def get(db: Session = Depends(deps.get_db), *, wallet_id: int, page: int = 0, pageSize: int = 100):
+async def get(db: Session = Depends(get_db), *, wallet_id: int, page: int = 0, pageSize: int = 100):
     page = page
     page_size = pageSize
     crud.wallet.get(id=wallet_id, error_out=True)
@@ -69,7 +69,7 @@ async def create(*, transaction: TransactionSchemaCreate):
 
 
 @router.put("/{transaction_id}", response_model=TransactionDetailSchema)
-async def update(*, db: Session = Depends(deps.get_db), transaction_id: int, transaction_data: TransactionSchemaUpdate):
+async def update(*, db: Session = Depends(get_db), transaction_id: int, transaction_data: TransactionSchemaUpdate):
     if transaction_data.wallet_id:
         crud.wallet.get(db=db, id=transaction_data.wallet_id)
     if transaction_data.category_id:
