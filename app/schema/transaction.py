@@ -43,3 +43,12 @@ class TransactionSchemaCreate(TransactionSchemaBase):
 
 class TransactionSchemaUpdate(TransactionSchemaBase):
     pass
+
+
+class TransactionTotalAmount(SchemaBase):
+    class TotalAmount(BaseModel):
+        khoan_thu: int = 0
+        khoan_chi: int = 0
+        cho_vay_di_vay: int = 0
+
+    data: TotalAmount

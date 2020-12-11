@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
+from typing import Optional
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 
@@ -9,7 +11,7 @@ from app.models.category import Category
 from app.models.transaction import Transaction
 from app.helpers.response_helper import ResponseHelper
 from app.schema.transaction import TransactionSchemaCreate, TransactionSchemaUpdate, TransactionListSchema, \
-    TransactionDetailSchema
+    TransactionDetailSchema, TransactionTotalAmount
 
 router = APIRouter()
 
@@ -43,6 +45,32 @@ async def get(db: Session = Depends(get_db), *, wallet_id: int, page: int = 0, p
     return {
         "data": transactions,
         "metadata": ResponseHelper.pagination_meta(page, page_size, total_items)
+    }
+
+
+@router.get("/total-amount", response_model=TransactionTotalAmount)
+async def total_amount(db: Session = Depends(get_db), *, wallet_id: Optional[int] = None):
+    if wallet_id:
+        crud.wallet.get(id=wallet_id, error_out=True)
+    from_date = (datetime.today().replace(day=1) - timedelta(days=1)).replace(day=25).date()
+    to_date = datetime.today().replace(day=25).date()
+
+    _query = db.query(func.sum(Transaction.amount).label('total_amount'), Category.type) \
+        .join(Transaction, Transaction.category_id == Category.id) \
+        .filter(Transaction.date_tran >= from_date, Transaction.date_tran < to_date)
+
+    if wallet_id:
+        _query = _query.filter(Transaction.wallet_id == wallet_id)
+
+    total_trans = _query.group_by(Category.type).all()
+    total_trans = {total_tran.type: total_tran.total_amount for total_tran in total_trans}
+
+    return {
+        "data": {
+            'khoan_thu': total_trans['khoan_thu'] if 'khoan_thu' in total_trans else 0,
+            'khoan_chi': total_trans['khoan_chi'] if 'khoan_chi' in total_trans else 0,
+            'cho_vay_di_vay': total_trans['cho_vay_di_vay'] if 'cho_vay_di_vay' in total_trans else 0
+        }
     }
 
 
