@@ -19,6 +19,7 @@ class CategorySchemaBase(BaseModel):
 class CategoryListSchema(SchemaBase):
     class CategoryList(CategorySchemaBase):
         id: int
+        total_amount: int = 0
 
     data: Optional[List[CategoryList]]
     metadata: Optional[MetadataSchema]
