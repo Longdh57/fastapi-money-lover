@@ -17,31 +17,39 @@ router = APIRouter()
 
 
 @router.get("", response_model=TransactionListSchema)
-async def get(db: Session = Depends(get_db), *, wallet_id: int, page: int = 0, pageSize: int = 100):
+async def get(db: Session = Depends(get_db), *, wallet_id: int, category_id: int = None, page: int = 0,
+              pageSize: int = 100):
     page = page
     page_size = pageSize
-    crud.wallet.get(id=wallet_id, error_out=True)
     from_date = (datetime.today().replace(day=1) - timedelta(days=1)).replace(day=25).date()
     to_date = datetime.today().replace(day=25).date()
-    query = db.query(Transaction, Category) \
+
+    crud.wallet.get(id=wallet_id, error_out=True)
+    if category_id:
+        crud.category.get(id=category_id, error_out=True)
+
+    _query = db.query(Transaction, Category) \
         .join(Transaction, Transaction.category_id == Category.id).filter(
         Transaction.date_tran >= from_date,
         Transaction.date_tran < to_date,
         Transaction.wallet_id == wallet_id
-    ).order_by(Transaction.date_tran.desc(), Transaction.id.desc()).all()
-    transactions = []
-    for item in query:
-        transactions.append({
-            "id": item.Transaction.id,
-            "amount": item.Transaction.amount,
-            "description": item.Transaction.description,
-            "date_tran": item.Transaction.date_tran,
-            "category_id": item.Transaction.category_id,
-            "category_name": item.Category.name,
-            "category_type": item.Category.type,
-            "wallet_id": item.Transaction.wallet_id
-        })
+    )
+    if category_id:
+        _query = _query.filter(Transaction.category_id == category_id)
+    query = _query.order_by(Transaction.date_tran.desc(), Transaction.id.desc()).all()
+
+    transactions = [{
+        "id": item.Transaction.id,
+        "amount": item.Transaction.amount,
+        "description": item.Transaction.description,
+        "date_tran": item.Transaction.date_tran,
+        "category_id": item.Transaction.category_id,
+        "category_name": item.Category.name,
+        "category_type": item.Category.type,
+        "wallet_id": item.Transaction.wallet_id
+    } for item in query]
     total_items = 10
+
     return {
         "data": transactions,
         "metadata": ResponseHelper.pagination_meta(page, page_size, total_items)
