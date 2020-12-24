@@ -11,6 +11,7 @@ class CategorySchemaBase(BaseModel):
     description: Optional[str] = None
     quota: Optional[int] = 0
     type: Optional[str] = None
+    icon: Optional[str] = None
 
     class Config:
         orm_mode = True
