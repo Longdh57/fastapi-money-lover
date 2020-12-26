@@ -9,3 +9,4 @@ class Category(BareBaseModel):
     description = Column(Text)
     quota = Column(Integer, default=0)
     type = Column(String, default=CategoryType.KHOAN_CHI.value, index=True)
+    icon = Column(String(20), nullable=True)
