@@ -12,17 +12,25 @@ from app.models.transaction import Transaction
 from app.helpers.response_helper import ResponseHelper
 from app.schema.transaction import TransactionSchemaCreate, TransactionSchemaUpdate, TransactionListSchema, \
     TransactionDetailSchema, TransactionTotalAmount
+from app.utils.utils import get_from_date_and_to_date
 
 router = APIRouter()
 
 
 @router.get("", response_model=TransactionListSchema)
-async def get(db: Session = Depends(get_db), *, wallet_id: int, category_id: int = None, page: int = 0,
-              pageSize: int = 100):
+async def get(
+        db: Session = Depends(get_db),
+        *,
+        wallet_id: int,
+        category_id: int = None,
+        month: int = None,
+        year: int = None,
+        page: int = 0,
+        pageSize: int = 100
+):
     page = page
     page_size = pageSize
-    from_date = (datetime.today().replace(day=1) - timedelta(days=1)).replace(day=25).date()
-    to_date = datetime.today().replace(day=25).date()
+    from_date, to_date = get_from_date_and_to_date()
 
     crud.wallet.get(id=wallet_id, error_out=True)
     if category_id:
@@ -57,11 +65,16 @@ async def get(db: Session = Depends(get_db), *, wallet_id: int, category_id: int
 
 
 @router.get("/total-amount", response_model=TransactionTotalAmount)
-async def total_amount(db: Session = Depends(get_db), *, wallet_id: Optional[int] = None):
+async def total_amount(
+        db: Session = Depends(get_db),
+        *,
+        month: int = None,
+        year: int = None,
+        wallet_id: Optional[int] = None
+):
     if wallet_id:
         crud.wallet.get(id=wallet_id, error_out=True)
-    from_date = (datetime.today().replace(day=1) - timedelta(days=1)).replace(day=25).date()
-    to_date = datetime.today().replace(day=25).date()
+    from_date, to_date = get_from_date_and_to_date()
 
     _query = db.query(func.sum(Transaction.amount).label('total_amount'), Category.type) \
         .join(Transaction, Transaction.category_id == Category.id) \

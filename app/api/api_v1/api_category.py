@@ -10,20 +10,32 @@ from app.helpers.enums import CategoryType
 from app.models import Category, Transaction
 from app.schema.category import CategoryListSchema, CategoryDetailSchema, CategorySchemaCreate
 from app.helpers.response_helper import ResponseHelper
+from app.utils.utils import get_from_date_and_to_date
 
 router = APIRouter()
 
 
 @router.get("", response_model=CategoryListSchema)
-async def get(db: Session = Depends(get_db), type: Optional[CategoryType] = None, page: int = 0, pageSize: int = 100):
+async def get(
+        db: Session = Depends(get_db),
+        type: Optional[CategoryType] = None,
+        month: int = None,
+        year: int = None,
+        page: int = 0,
+        pageSize: int = 100
+):
     page = page
     page_size = pageSize
     _query = crud.category.q()
     if type is not None:
         _query = _query.filter(Category.type == type)
 
-    total_amounts = db.query(Transaction.category_id, func.sum(Transaction.amount).label('total_amount')) \
-        .group_by(Transaction.category_id).all()
+    from_date, to_date = get_from_date_and_to_date()
+
+    total_amounts = db.query(Transaction.category_id, func.sum(Transaction.amount).label('total_amount')).filter(
+        Transaction.date_tran >= from_date,
+        Transaction.date_tran < to_date
+    ).group_by(Transaction.category_id).all()
     mapping_cat_amount = {total_amount.category_id: total_amount.total_amount for total_amount in total_amounts}
 
     categories = _query.order_by(Category.name.asc()).all()
