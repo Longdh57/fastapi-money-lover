@@ -8,9 +8,9 @@ from app import crud
 from app.db.base_class import get_db
 from app.helpers.enums import CategoryType
 from app.models import Category, Transaction
-from app.schema.category import CategoryListSchema, CategoryDetailSchema, CategorySchemaCreate
 from app.helpers.response_helper import ResponseHelper
 from app.utils.utils import get_from_date_and_to_date
+from app.schema.category import CategoryListSchema, CategoryDetailSchema, CategorySchemaCreate
 
 router = APIRouter()
 
@@ -21,6 +21,7 @@ async def get(
         type: Optional[CategoryType] = None,
         month: int = None,
         year: int = None,
+        all: bool = False,
         page: int = 0,
         pageSize: int = 100
 ):
@@ -29,6 +30,8 @@ async def get(
     _query = crud.category.q()
     if type is not None:
         _query = _query.filter(Category.type == type)
+    if all is False:
+        _query = _query.filter(Category.deleted == None)
 
     from_date, to_date = get_from_date_and_to_date()
 
