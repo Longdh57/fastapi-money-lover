@@ -14,7 +14,7 @@ router = APIRouter()
 async def get(page: int = 0, pageSize: int = 10):
     page = page
     page_size = pageSize
-    wallets = crud.wallet.get_multi(skip=page, limit=page_size)
+    wallets = crud.wallet.q().order_by(Wallet.id.asc()).all()
     total_items = 4
     return {
         "data": wallets,

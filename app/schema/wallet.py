@@ -8,6 +8,7 @@ from app.schema.base import SchemaBase, MetadataSchema
 class WalletSchemaBase(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    type: Optional[str] = None
 
     class Config:
         orm_mode = True
