@@ -3,7 +3,7 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from app.helpers.enums import CategoryType
-from app.schema.base import SchemaBase, MetadataSchema
+from app.schema.base import ResponseSchemaBase, MetadataSchema
 
 
 class CategorySchemaBase(BaseModel):
@@ -17,7 +17,7 @@ class CategorySchemaBase(BaseModel):
         orm_mode = True
 
 
-class CategoryListSchema(SchemaBase):
+class CategoryListSchema(ResponseSchemaBase):
     class CategoryList(CategorySchemaBase):
         id: int
         total_amount: int = 0
@@ -26,7 +26,7 @@ class CategoryListSchema(SchemaBase):
     metadata: Optional[MetadataSchema]
 
 
-class CategoryDetailSchema(SchemaBase):
+class CategoryDetailSchema(ResponseSchemaBase):
     class CategoryDetail(CategorySchemaBase):
         id: int
 

@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
-from app.schema.base import SchemaBase, MetadataSchema
+from app.schema.base import ResponseSchemaBase, MetadataSchema
 
 
 class WalletSchemaBase(BaseModel):
@@ -14,7 +14,7 @@ class WalletSchemaBase(BaseModel):
         orm_mode = True
 
 
-class WalletListSchema(SchemaBase):
+class WalletListSchema(ResponseSchemaBase):
     class WalletList(WalletSchemaBase):
         id: int
 
@@ -22,7 +22,7 @@ class WalletListSchema(SchemaBase):
     metadata: Optional[MetadataSchema]
 
 
-class WalletDetailSchema(SchemaBase):
+class WalletDetailSchema(ResponseSchemaBase):
     class WalletDetail(WalletSchemaBase):
         id: int
 

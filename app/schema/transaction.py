@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
-from app.schema.base import SchemaBase, MetadataSchema
+from app.schema.base import ResponseSchemaBase, MetadataSchema
 
 
 class TransactionSchemaBase(BaseModel):
@@ -17,7 +17,7 @@ class TransactionSchemaBase(BaseModel):
         orm_mode = True
 
 
-class TransactionListSchema(SchemaBase):
+class TransactionListSchema(ResponseSchemaBase):
     class TransactionSchema(TransactionSchemaBase):
         id: int
         category_name: str
@@ -27,7 +27,7 @@ class TransactionListSchema(SchemaBase):
     metadata: Optional[MetadataSchema]
 
 
-class TransactionDetailSchema(SchemaBase):
+class TransactionDetailSchema(ResponseSchemaBase):
     class TransactionDetail(TransactionSchemaBase):
         id: int
 
@@ -45,7 +45,7 @@ class TransactionSchemaUpdate(TransactionSchemaBase):
     pass
 
 
-class TransactionTotalAmount(SchemaBase):
+class TransactionTotalAmount(ResponseSchemaBase):
     class TotalAmount(BaseModel):
         khoan_thu: int = 0
         khoan_chi: int = 0
