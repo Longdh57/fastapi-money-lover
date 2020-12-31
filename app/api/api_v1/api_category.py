@@ -36,7 +36,7 @@ async def get(
     if all is False:
         _query = _query.filter(Category.deleted == None)
 
-    from_date, to_date = get_from_date_and_to_date()
+    from_date, to_date = get_from_date_and_to_date(month=month, year=year)
 
     total_amounts = db.query(Transaction.category_id, func.sum(Transaction.amount).label('total_amount')).filter(
         Transaction.date_tran >= from_date,
