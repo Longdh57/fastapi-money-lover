@@ -30,7 +30,7 @@ async def get(
 ):
     page = page
     page_size = pageSize
-    from_date, to_date = get_from_date_and_to_date()
+    from_date, to_date = get_from_date_and_to_date(month=month, year=year)
 
     crud.wallet.get(id=wallet_id, error_out=True)
     if category_id:
@@ -74,7 +74,7 @@ async def total_amount(
 ):
     if wallet_id:
         crud.wallet.get(id=wallet_id, error_out=True)
-    from_date, to_date = get_from_date_and_to_date()
+    from_date, to_date = get_from_date_and_to_date(month=month, year=year)
 
     _query = db.query(func.sum(Transaction.amount).label('total_amount'), Category.type) \
         .join(Transaction, Transaction.category_id == Category.id) \
