@@ -14,7 +14,7 @@ def get_list(text):
 
 class Settings(BaseSettings):
     API_PREFIX = '/api/v1'
-    PROJECT_NAME = os.getenv('PROJECT_NAME', 'Money Lover')
+    PROJECT_NAME = os.getenv('PROJECT_NAME', 'Money Couple')
     SECRET_KEY = os.getenv('SECRET_KEY', '')
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = get_list(os.getenv('FONTEND_URL'))
     DATABASE_URL = os.getenv('SQL_DATABASE_URL', '')

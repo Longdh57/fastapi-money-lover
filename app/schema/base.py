@@ -1,6 +1,9 @@
-from typing import Optional
+from typing import Optional, Generic, TypeVar
 
 from pydantic import BaseModel
+from pydantic.generics import GenericModel
+
+T = TypeVar("T")
 
 
 class ResponseSchemaBase(BaseModel):
@@ -18,3 +21,17 @@ class MetadataSchema(BaseModel):
     next_page: Optional[int] = None
     previous_page: Optional[int] = None
     total_pages: int
+
+
+class DataResponse(ResponseSchemaBase, GenericModel, Generic[T]):
+    data: Optional[T] = None
+
+    def custom_response(self, resp_code: str, message: str):
+        self.code = resp_code
+        self.message = message
+        return self
+
+    def success_response(self, data: T):
+        self.code = '00'
+        self.data = data
+        return self

@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi_sqlalchemy import DBSessionMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.api import router
@@ -22,6 +23,7 @@ app.add_middleware(
 
 app.include_router(router, prefix=settings.API_PREFIX)
 app.add_exception_handler(AppBaseException, base_exception_handler)
+app.add_middleware(DBSessionMiddleware, db_url=settings.DATABASE_URL)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
