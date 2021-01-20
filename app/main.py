@@ -1,4 +1,5 @@
 import uvicorn
+import logging
 from fastapi import FastAPI
 from fastapi_sqlalchemy import DBSessionMiddleware
 from starlette.middleware.cors import CORSMiddleware
@@ -9,6 +10,7 @@ from app.models.base_model import Base
 from app.db.base_class import engine
 from app.utils.exception import AppBaseException, base_exception_handler
 
+logging.config.fileConfig(settings.LOGGING_CONFIG_FILE, disable_existing_loggers=False)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_PREFIX}/openapi.json")
