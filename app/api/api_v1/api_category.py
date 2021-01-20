@@ -40,10 +40,10 @@ async def get(
 
     total_amounts = db.query(Transaction.category_id, func.sum(Transaction.amount).label('total_amount')).filter(
         Transaction.date_tran >= from_date,
-        Transaction.date_tran < to_date
+        Transaction.date_tran < to_date,
+        Transaction.deleted == None
     ).group_by(Transaction.category_id).all()
     mapping_cat_amount = {total_amount.category_id: total_amount.total_amount for total_amount in total_amounts}
-
     categories = _query.order_by(Category.name.asc()).all()
     cat_data = []
     for category in categories:
