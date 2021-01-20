@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     SECRET_KEY = os.getenv('SECRET_KEY', '')
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = get_list(os.getenv('FONTEND_URL'))
     DATABASE_URL = os.getenv('SQL_DATABASE_URL', '')
+    LOGGING_CONFIG_FILE = os.path.join(BASE_DIR, 'logging.ini')
 
 
 settings = Settings()

@@ -10,6 +10,7 @@ from app.db.base_class import get_db
 from app.models.category import Category
 from app.models.transaction import Transaction
 from app.helpers.response_helper import ResponseHelper
+from app.schema.base import ResponseSchemaBase
 from app.schema.transaction import TransactionSchemaCreate, TransactionSchemaUpdate, TransactionListSchema, \
     TransactionDetailSchema, TransactionTotalAmount
 from app.utils.utils import get_from_date_and_to_date
@@ -44,7 +45,9 @@ async def get(
     )
     if category_id:
         _query = _query.filter(Transaction.category_id == category_id)
-    query = _query.order_by(Transaction.date_tran.desc(), Transaction.id.desc()).all()
+
+    query = _query.filter(Transaction.deleted == None) \
+        .order_by(Transaction.date_tran.desc(), Transaction.id.desc()).all()
 
     transactions = [{
         "id": item.Transaction.id,
@@ -126,3 +129,12 @@ async def update(*, db: Session = Depends(get_db), transaction_id: int, transact
     transaction = crud.transaction.get(db=db, id=transaction_id, error_out=True)
     transaction = crud.transaction.update(db=db, db_obj=transaction, obj_in=transaction_data)
     return {"data": transaction}
+
+
+@router.put('/{transaction_id}/archive', response_model=ResponseSchemaBase)
+async def archive(*, db: Session = Depends(get_db), transaction_id: int):
+    transaction = crud.transaction.get(db=db, id=transaction_id, error_out=True)
+    crud.transaction.update(db=db, db_obj=transaction, obj_in={
+        'deleted': datetime.now() if transaction.deleted is None else None
+    })
+    return {'message': 'Success'}
