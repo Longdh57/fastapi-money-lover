@@ -1,21 +1,40 @@
 version: "3.4"
 
 services:
+  db:
+    image: postgres:13.1
+    volumes:
+      - $PWD/postgresql.conf:/etc/postgresql/postgresql.conf
+      - $PWD/.docker/db/data:/var/lib/postgresql/data
+    expose:
+      - "${DB_PORT}"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    restart: unless-stopped
+
   migrate:
-    image: money-lover:latest
+    image: registry.gitlab.com/long.daohai4894/money-couple:latest
     env_file: .env
     command: ["alembic", "upgrade", "head"]
-    network_mode: host
+    depends_on:
+      - db
 
   app:
-    image: money-lover:latest
+    image: registry.gitlab.com/long.daohai4894/money-couple:latest
     ports:
       - "${DEFAULT_PORT}:${DEFAULT_PORT}"
     restart: unless-stopped
     env_file: .env
-    network_mode: host
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${DEFAULT_PORT}"]
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:${DEFAULT_PORT}/api/v1/healthcheck" ]
-      interval: 30s
-      timeout: 20s
+      interval: 20s
+      timeout: 10s
       retries: 3
+    depends_on:
+      - db
+      - migrate

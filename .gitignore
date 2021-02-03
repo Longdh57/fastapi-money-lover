@@ -72,3 +72,5 @@ celerybeat-schedule
 
 # virtualenv
 .venv
+
+.docker/db/data
